@@ -61,7 +61,20 @@ Serverless adaptations (all driven by `VERCEL=1` and `apps/api/vercel.json`):
 
 Required API environment variables: `APP_KEY`, `BLIND_INDEX_KEY`,
 `DB_URL` (PostgreSQL, SSL; the database must allow the `btree_gist` extension),
-`FRONTEND_URL`. Web: `API_URL` (the API's production URL), `SESSION_SECRET`.
+`FRONTEND_URL`. Web: `API_URL` (the API's production URL), `SESSION_SECRET`,
+and `API_PROTECTION_BYPASS` when the API project is behind Vercel
+Authentication.
+
+### Current deployment (team "Tegnol")
+
+| Project | Production URL | Access |
+|---------|----------------|--------|
+| `tax-compliance-web` | https://tax-compliance-web-tegnol.vercel.app | Public (the app has its own sign-in) |
+| `tax-compliance-api` | https://tax-compliance-api.vercel.app | Vercel Authentication; the web server passes a protection-bypass secret |
+
+Both projects deploy on every push to the production branch. The web app pins
+its framework in `apps/web/vercel.json`. The API refuses cross-origin browser
+access (CORS closed) because only the BFF calls it.
 
 **Documents on Vercel.** The function filesystem is ephemeral. Until an
 S3-compatible bucket is configured (`DOCUMENTS_DISK=s3` plus `AWS_*`), uploaded
