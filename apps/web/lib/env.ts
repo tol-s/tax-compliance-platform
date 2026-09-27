@@ -18,6 +18,13 @@ export const serverEnv = {
     if (secret.length < 32) throw new Error("SESSION_SECRET must be at least 32 characters")
     return secret
   },
+  /**
+   * Optional Vercel "Protection Bypass for Automation" secret for the API
+   * project. Lets this server reach a Vercel-protected API; never sent to browsers.
+   */
+  get apiProtectionBypass(): string | undefined {
+    return process.env.API_PROTECTION_BYPASS || undefined
+  },
   get isProduction() {
     return process.env.NODE_ENV === "production"
   },

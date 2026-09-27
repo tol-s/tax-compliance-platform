@@ -12,7 +12,9 @@ async function signIn(page: Page, email: string) {
   await expect(page).toHaveURL(/\/dashboard$/)
 }
 
-test("a manager adds a NON-VAT client from its certificate, then records a VAT registration with evidence", async ({ page }) => {
+test("a manager adds a NON-VAT client from its certificate, then records a VAT registration with evidence", async ({
+  page,
+}) => {
   const name = `E2E Fictional Traders ${Date.now()}`
   await signIn(page, "tax-manager@demo.test")
   await page.goto("/clients")

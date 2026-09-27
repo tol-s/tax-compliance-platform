@@ -39,6 +39,7 @@ async function handle(request: NextRequest, { params }: { params: Promise<{ path
   }
   if (!headers.has("accept")) headers.set("accept", "application/json")
   if (!headers.has("x-correlation-id")) headers.set("x-correlation-id", crypto.randomUUID())
+  if (serverEnv.apiProtectionBypass) headers.set("x-vercel-protection-bypass", serverEnv.apiProtectionBypass)
 
   const upstream = await fetch(url, {
     method: request.method,

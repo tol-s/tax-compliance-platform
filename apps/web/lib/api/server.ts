@@ -28,6 +28,7 @@ export async function apiFetch<T>(path: string, init: ApiRequestInit = {}): Prom
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       "X-Correlation-ID": correlationId ?? crypto.randomUUID(),
+      ...(serverEnv.apiProtectionBypass ? { "x-vercel-protection-bypass": serverEnv.apiProtectionBypass } : {}),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -24,7 +24,11 @@ export function AppShell({ me, defaultOpen, children }: { me: Me; defaultOpen: b
               Demo organisation · fictional data for demonstration only. Not real taxpayers, not real tax rules.
             </div>
           ) : null}
-          <div id="main" className="mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-6 md:px-6 lg:px-8" tabIndex={-1}>
+          <div
+            id="main"
+            className="mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-6 md:px-6 lg:px-8"
+            tabIndex={-1}
+          >
             {children}
           </div>
         </SidebarInset>

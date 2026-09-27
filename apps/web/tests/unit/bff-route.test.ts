@@ -68,6 +68,22 @@ describe("BFF proxy", () => {
     expect(response.headers.get("cache-control")).toBe("no-store")
   })
 
+  it("adds the Vercel protection bypass secret only when configured", async () => {
+    const { GET } = await import("@/app/api/bff/[...path]/route")
+    getSession.mockResolvedValue({ token: "t", expiresAt: new Date().toISOString() })
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }))
+
+    process.env.API_PROTECTION_BYPASS = "bypass-secret"
+    await GET(new NextRequest("http://app.test/api/bff/me"), params(["me"]))
+    delete process.env.API_PROTECTION_BYPASS
+    await GET(new NextRequest("http://app.test/api/bff/me"), params(["me"]))
+
+    const first = new Headers((fetchSpy.mock.calls[0]![1] as RequestInit).headers)
+    const second = new Headers((fetchSpy.mock.calls[1]![1] as RequestInit).headers)
+    expect(first.get("x-vercel-protection-bypass")).toBe("bypass-secret")
+    expect(second.get("x-vercel-protection-bypass")).toBeNull()
+  })
+
   it("rejects path traversal", async () => {
     const { GET } = await import("@/app/api/bff/[...path]/route")
     getSession.mockResolvedValue({
