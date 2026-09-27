@@ -86,3 +86,9 @@ it('sends security headers and echoes a supplied correlation id', function () {
         ->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertHeader('X-Frame-Options', 'DENY');
 });
+
+it('grants no cross-origin access, since only the BFF calls the API', function () {
+    $this->getJson('/api/v1/health', ['Origin' => 'https://evil.example'])
+        ->assertHeaderMissing('Access-Control-Allow-Origin')
+        ->assertHeaderMissing('X-Powered-By');
+});

@@ -13,6 +13,10 @@ class SecurityHeaders
     {
         $response = $next($request);
 
+        // Do not advertise the runtime version (php.ini expose_php cannot be set on every host).
+        header_remove('X-Powered-By');
+        $response->headers->remove('X-Powered-By');
+
         $response->headers->add([
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'DENY',
