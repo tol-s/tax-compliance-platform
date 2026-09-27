@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [AssignCorrelationId::class, SecurityHeaders::class]);
         $middleware->alias(['tenant' => ResolveTenant::class]);
+        // Tenant context must exist before route-model binding resolves tenant-owned models,
+        // so bound IDs from another organisation resolve to 404.
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: ResolveTenant::class);
         // Behind a reverse proxy / load balancer in every deployed environment.
         $middleware->trustProxies(at: '*');
     })

@@ -31,7 +31,8 @@ test("owner sees the full shell, demo banner and honest empty states", async ({ 
 
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible()
   await expect(page.getByRole("note")).toContainText("Demo organisation")
-  await expect(page.getByText("No clients yet")).toBeVisible()
+  // Demo data exists, so the dashboard shows computed figures, not an empty state.
+  await expect(page.getByRole("region", { name: "Compliance health" }).getByText("VAT registered")).toBeVisible()
 
   const nav = page.getByRole("navigation", { name: "Primary" }).or(page.locator("[data-sidebar=sidebar]"))
   for (const item of ["Clients", "Integrations", "Tax engine", "Forms", "Users", "Audit log"]) {

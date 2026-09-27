@@ -31,6 +31,15 @@ enum SystemRole: string
         };
     }
 
+    /**
+     * Whether the role sees every client in the organisation. Preparers,
+     * accountants and read-only users only see clients assigned to them.
+     */
+    public function seesAllClients(): bool
+    {
+        return in_array($this, [self::Owner, self::Admin, self::TaxManager, self::Reviewer], true);
+    }
+
     /** @return list<P> */
     public function permissions(): array
     {

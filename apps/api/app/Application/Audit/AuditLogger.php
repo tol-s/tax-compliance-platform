@@ -42,6 +42,7 @@ class AuditLogger
         array $metadata = [],
         ?User $actor = null,
         ?string $organizationId = null,
+        ?string $clientId = null,
     ): AuditLog {
         $actor ??= $this->auth->guard()->user();
         $organizationId ??= $this->tenant->has() ? $this->tenant->organizationId() : null;
@@ -55,6 +56,7 @@ class AuditLogger
             'action' => $action,
             'entity_type' => $entity ? $entity->getMorphClass() : null,
             'entity_id' => $entity?->getKey(),
+            'client_id' => $clientId,
             'before' => $before ? $this->redact($before) : null,
             'after' => $after ? $this->redact($after) : null,
             'metadata' => $metadata ? $this->redact($metadata) : null,

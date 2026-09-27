@@ -34,6 +34,12 @@ return [
     */
     'demo_mode' => (bool) env('DEMO_MODE', false),
 
+    /*
+    | Key for blind indexes over encrypted columns. Must stay stable: changing it
+    | requires re-indexing. Defaults to APP_KEY when unset.
+    */
+    'blind_index_key' => env('BLIND_INDEX_KEY'),
+
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
     /*

@@ -27,7 +27,8 @@ listed with their implementation status.
   from another organisation all resolve to *deny*.
 - Segregation of duties: preparers cannot approve; reviewers cannot run
   calculations.
-- Client-level assignment for preparers: Phase 2 (`client_user`).
+- ✅ Client-level visibility: roles without `sees_all_clients` only see
+  assigned clients (`client_user`); others' clients answer 404.
 - UI hides what a user cannot do, but **the API re-checks every action**.
 
 ## Tenant isolation ✅
@@ -58,8 +59,14 @@ listed with their implementation status.
 - ✅ Error responses never include stack traces, SQL or internal messages;
   each carries a correlation ID linking to server logs.
 - ✅ Structured JSON logs; policy: no TINs, amounts, tokens or personal data in logs.
-- Phase 2: taxpayer identifiers encrypted with a blind index for search;
-  documents in private S3 buckets with short-lived signed URLs; downloads audited.
+- ✅ Taxpayer identifiers encrypted at rest, matched through an HMAC blind
+  index (`BLIND_INDEX_KEY`; keep it stable, changing it requires re-indexing),
+  masked in audit rows and for users without `tax_profile.view`.
+- ✅ Documents on a private disk under random keys, type/size validated,
+  SHA-256 recorded, served only through the authorised endpoint (proxied by the
+  BFF), every download audited.
+- ✅ New members get a random temporary password shown once to the
+  administrator; it is never logged or written to the audit trail.
 
 ## Secrets
 

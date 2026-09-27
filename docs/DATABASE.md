@@ -147,7 +147,13 @@ composite indexes on the columns the Data Grid filters by.
 
 ## Status of this schema
 
-Phase 1 creates: `organizations`, `users`, `organization_user`, `roles`,
+Phase 1 created: `organizations`, `users`, `organization_user`, `roles`,
 `permissions`, `permission_role`, `personal_access_tokens`, `audit_logs`, plus
-Laravel infrastructure tables. Subsequent phases add the rest as listed in
+Laravel infrastructure tables.
+
+Phase 2 added: `clients`, `taxpayer_profiles`, `tax_registration_statuses`
+(with the `btree_gist` no-overlap exclusion constraint and CHECK constraints on
+status and source), `documents`, `client_user`, `roles.sees_all_clients` and
+`audit_logs.client_id`. `registration_documents` was folded into `documents`
+(`kind` + `client_id`) and `tax_registration_statuses.source_document_id`. Subsequent phases add the rest as listed in
 `docs/IMPLEMENTATION_PLAN.md`.

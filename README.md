@@ -13,7 +13,7 @@ domain expert (see `docs/PHILIPPINE_TAX_IMPLEMENTATION.md`).
 
 ## Status
 
-Phase 1 (foundation) is complete. See `docs/IMPLEMENTATION_PLAN.md`.
+Phases 1 (foundation) and 2 (client management) are complete. See `docs/IMPLEMENTATION_PLAN.md`.
 
 | Area | State |
 |------|-------|
@@ -23,7 +23,8 @@ Phase 1 (foundation) is complete. See `docs/IMPLEMENTATION_PLAN.md`.
 | Append-only audit log (DB trigger), correlation IDs | ✅ |
 | Design system, ReUI/shadcn components, app shell, Cmd/Ctrl+K | ✅ |
 | All IA routes with honest empty states (no fabricated data) | ✅ |
-| Clients, integrations, tax engine, forms, workflow | Phases 2-11 |
+| Clients, taxpayer registration (effective-dated, evidenced), documents, users, audit viewer | ✅ Phase 2 |
+| Integrations, tax engine, forms, workflow | Phases 3-11 |
 
 ## Repository layout
 

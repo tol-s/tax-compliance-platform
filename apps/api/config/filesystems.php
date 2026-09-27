@@ -16,6 +16,13 @@ return [
     'default' => env('FILESYSTEM_DISK', 'local'),
 
     /*
+    | Private disk for taxpayer documents and generated forms. Use an S3-compatible
+    | bucket in any deployed environment; files are only ever served through the
+    | authorised, audited download endpoint.
+    */
+    'documents_disk' => env('DOCUMENTS_DISK', 'local'),
+
+    /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------

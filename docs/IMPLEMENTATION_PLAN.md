@@ -7,7 +7,7 @@ linting and migrations pass and the apps start. Status legend:
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 1 | Foundation | ✅ |
-| 2 | Client management | ⬜ |
+| 2 | Client management | ✅ |
 | 3 | Accounting abstraction | ⬜ |
 | 4 | Tax engine | ⬜ |
 | 5 | Threshold engine + VAT/non-VAT | ⬜ |
@@ -52,16 +52,40 @@ Infrastructure
 - `docker-compose.yml`: postgres, redis, minio, api (php-fpm + nginx), worker,
   scheduler, web.
 
-## Phase 2: Client management
-- `clients`, `taxpayer_profiles`, `tax_registration_statuses` (effective-dated,
-  source, document), `documents`, `registration_documents`, `client_user`.
-- Actions: CreateClient, UpdateTaxpayerProfile, ChangeRegistrationStatus
-  (requires effective date + reason + document; audited), UploadDocument
-  (S3, SHA-256, signed URLs).
-- API: `/api/v1/clients`, `/api/v1/tax-profiles`, `/api/v1/audit`.
-- UI: clients Data Grid, client workspace header + tabs, Tax Profile workspace
-  with prominent VAT status + source + history timeline, audit timeline.
-- Users & roles settings pages.
+## Phase 2: Client management ✅
+
+Backend
+- `clients` (TIN encrypted + keyed blind index for exact search and per-tenant
+  uniqueness), `taxpayer_profiles`, `tax_registration_statuses`, `documents`,
+  `client_user`, `roles.sees_all_clients`, `audit_logs.client_id`.
+- Registration status: effective-dated, half-open ranges; a PostgreSQL
+  exclusion constraint makes overlapping periods impossible; rows are
+  immutable (only closing `effective_to` once is allowed); changes require an
+  effective date, a reason and a supporting document; BIR-certificate sources
+  require the certificate; administrator overrides require `settings.manage`;
+  history cannot be backdated. `Client::registrationAsOf($date)` is the read
+  path the tax engine will use.
+- Client-level visibility: Owner/Admin/Tax Manager/Reviewer see all clients;
+  Tax Preparer/Accountant/Read Only see assigned clients only; invisible
+  clients return 404.
+- Documents: private disk, random tenant-prefixed keys, SHA-256, type/size
+  validation, streamed through an authorised endpoint, downloads audited.
+- Members: add (one-time temporary password for new accounts), change role,
+  suspend; no self-edits; only owners manage owners; last owner protected.
+- Endpoints: `clients` (search/filter/sort/paginate), `clients/{id}`,
+  `registration-statuses`, `documents`, `assignments`, `clients/{id}/audit`,
+  `audit`, `dashboard` (real figures; unbuilt modules null), `search`,
+  `members`, `roles`, `reference`.
+- 92 Pest tests.
+
+Frontend
+- Clients ReUI Data Grid (server-side), create-client sheet with certificate
+  upload, client workspace header, overview, tax profile (registration card,
+  threshold monitoring placeholder that states it can only advise, change
+  status dialog, history timeline, documents, editable registration
+  information), client audit timeline, organisation audit log, users, role
+  matrix, real dashboard metrics and activity, client search in Cmd/Ctrl+K.
+- 28 unit tests, 14 end-to-end tests.
 
 ## Phase 3: Accounting abstraction
 - `AccountingProvider` interface; `XeroProvider`, `QuickBooksProvider` (OAuth2,

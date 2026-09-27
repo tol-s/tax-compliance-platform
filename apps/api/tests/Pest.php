@@ -8,6 +8,8 @@ use App\Domain\Tenancy\Models\Membership;
 use App\Domain\Tenancy\Models\Organization;
 use Database\Seeders\RbacCatalogueSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -41,4 +43,37 @@ function actingAsMember(SystemRole $role = SystemRole::Owner, ?Organization $org
     Sanctum::actingAs($result[0]);
 
     return $result;
+}
+
+/**
+ * Create a client through the API as the currently authenticated user.
+ *
+ * @param  array<string, mixed>  $overrides
+ */
+function createClientViaApi(array $overrides = [], ?UploadedFile $certificate = null): TestResponse
+{
+    $payload = array_replace_recursive([
+        'legal_name' => 'Fictional Trading Corp',
+        'trade_name' => 'Fictional Trading',
+        'taxpayer_identifier' => '123-456-789-00000',
+        'entity_type' => 'CORPORATION',
+        'industry' => 'Retail',
+        'profile' => ['fiscal_year_end_month' => 12, 'currency' => 'PHP'],
+        'registration' => [
+            'vat_status' => 'NON_VAT',
+            'status_source' => $certificate ? 'BIR_CERTIFICATE' : 'USER_ENTERED',
+            'effective_from' => '2025-01-01',
+        ],
+    ], $overrides);
+
+    if ($certificate) {
+        $payload['certificate'] = $certificate;
+    }
+
+    return test()->post('/api/v1/clients', $payload, ['Accept' => 'application/json']);
+}
+
+function certificatePdf(string $name = 'certificate.pdf'): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($name, "%PDF-1.4\n% fictional test certificate\n");
 }

@@ -12,14 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * A role groups permissions. System roles (organization_id = null) are shared
  * by all tenants and synchronised from the SystemRole enum.
  */
-#[Fillable(['organization_id', 'key', 'name', 'description', 'is_system'])]
+#[Fillable(['organization_id', 'key', 'name', 'description', 'is_system', 'sees_all_clients'])]
 class Role extends Model
 {
     use HasUuids;
 
     protected function casts(): array
     {
-        return ['is_system' => 'boolean'];
+        return ['is_system' => 'boolean', 'sees_all_clients' => 'boolean'];
     }
 
     /** @return BelongsToMany<Permission, $this> */

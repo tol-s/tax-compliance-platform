@@ -3,10 +3,18 @@
 namespace App\Providers;
 
 use App\Application\Identity\Authorization\PermissionResolver;
+use App\Domain\Clients\Models\Client;
+use App\Domain\Clients\Models\TaxpayerProfile;
+use App\Domain\Clients\Models\TaxRegistrationStatus;
+use App\Domain\Documents\Models\Document;
+use App\Domain\Identity\Models\Role;
 use App\Domain\Identity\Models\User;
+use App\Domain\Tenancy\Models\Membership;
+use App\Domain\Tenancy\Models\Organization;
 use App\Domain\Tenancy\TenantContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,6 +32,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::shouldBeStrict(! $this->app->isProduction());
+
+        // Stable, class-name-free identifiers in audit rows and polymorphic columns.
+        Relation::enforceMorphMap([
+            'organization' => Organization::class,
+            'membership' => Membership::class,
+            'user' => User::class,
+            'role' => Role::class,
+            'client' => Client::class,
+            'taxpayer_profile' => TaxpayerProfile::class,
+            'tax_registration_status' => TaxRegistrationStatus::class,
+            'document' => Document::class,
+        ]);
 
         // Permission abilities (e.g. "calculations.approve") are answered from the
         // user's membership in the current tenant. Other abilities fall through

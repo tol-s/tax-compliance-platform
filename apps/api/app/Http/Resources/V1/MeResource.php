@@ -32,7 +32,11 @@ class MeResource extends JsonResource
                 'mfa_enabled' => $this->mfa_enabled_at !== null,
             ],
             'organization' => $membership ? new OrganizationResource($membership->organization) : null,
-            'role' => $membership ? ['key' => $membership->role->key, 'name' => $membership->role->name] : null,
+            'role' => $membership ? [
+                'key' => $membership->role->key,
+                'name' => $membership->role->name,
+                'sees_all_clients' => $membership->role->sees_all_clients,
+            ] : null,
             'permissions' => app(PermissionResolver::class)->permissionsFor($this->resource),
             'memberships' => MembershipResource::collection(
                 $this->memberships()

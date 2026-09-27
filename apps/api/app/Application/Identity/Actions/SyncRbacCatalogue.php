@@ -29,7 +29,11 @@ class SyncRbacCatalogue
 
             foreach (SystemRole::cases() as $systemRole) {
                 $role = Role::query()->firstOrNew(['organization_id' => null, 'key' => $systemRole->value]);
-                $role->fill(['name' => $systemRole->label(), 'is_system' => true])->save();
+                $role->fill([
+                    'name' => $systemRole->label(),
+                    'is_system' => true,
+                    'sees_all_clients' => $systemRole->seesAllClients(),
+                ])->save();
 
                 $role->permissions()->sync(
                     array_map(fn (PermissionEnum $p) => $ids[$p->value], $systemRole->permissions())
