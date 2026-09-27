@@ -397,7 +397,12 @@ class DemoSeeder extends Seeder
     private function signIn(string $key): void
     {
         $user = $this->users[$key]->refresh();
-        $membership = $user->activeMembershipFor($user->current_organization_id);
+        // Sign-ins are only seeded while the membership was active, so look it up
+        // regardless of its status today (a member may have been suspended since).
+        $membership = Membership::query()
+            ->where('organization_id', $user->current_organization_id)
+            ->where('user_id', $user->getKey())
+            ->first();
 
         $user->forceFill(['last_login_at' => now()])->save();
         app(AuditLogger::class)->record('auth.login', $user, actor: $user, organizationId: $membership?->organization_id);

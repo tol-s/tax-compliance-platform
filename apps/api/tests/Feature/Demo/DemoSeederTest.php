@@ -61,6 +61,8 @@ it('gives every member of the main firm a year of their own activity, and nothin
     expect($months)->toBe(12)
         ->and(DB::table('audit_logs')->where('created_at', '>', '2026-09-26 00:00:00+08')->count())->toBe(0);
 
+    expect(DB::table('audit_logs')->where('action', 'auth.login')->whereNull('organization_id')->count())->toBe(0);
+
     $suspended = DB::table('users')->where('email', 'former-staff@demo.test')->value('id');
     expect(DB::table('audit_logs')->where('actor_id', $suspended)->where('created_at', '>', '2026-07-01 00:00:00+08')->count())->toBe(0);
 });
