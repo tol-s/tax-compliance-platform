@@ -4,12 +4,14 @@ import { AccessDenied } from "@/components/app/access-denied"
 import { PlannedFeature } from "@/components/app/planned-feature"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { IntegrationSettingsPreview } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Integration settings" }
 
 export default async function SettingsIntegrationsPage() {
   const me = await requireMe()
   if (!can(me, "settings.manage")) return <AccessDenied title={"Integration settings"} permission="settings.manage" />
+  if (me.organization?.is_demo) return <IntegrationSettingsPreview />
 
   return (
     <PlannedFeature

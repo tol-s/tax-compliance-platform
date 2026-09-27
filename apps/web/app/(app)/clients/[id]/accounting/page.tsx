@@ -1,8 +1,13 @@
 import { DatabaseIcon } from "lucide-react"
 
 import { EmptyState } from "@/components/app/empty-state"
+import { ClientAccountingPreview, loadPreviewClient } from "@/features/preview/components"
+import { requireMe } from "@/lib/auth/me"
 
-export default function AccountingTab() {
+export default async function AccountingTab({ params }: PageProps<"/clients/[id]/accounting">) {
+  const me = await requireMe()
+  if (me.organization?.is_demo) return <ClientAccountingPreview client={await loadPreviewClient((await params).id)} />
+
   return (
     <EmptyState
       icon={DatabaseIcon}

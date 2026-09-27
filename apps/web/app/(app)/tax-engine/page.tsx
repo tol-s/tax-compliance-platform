@@ -7,12 +7,14 @@ import { PlannedFeature } from "@/components/app/planned-feature"
 import { Button } from "@/components/ui/button"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { TaxEnginePreview } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Tax engine" }
 
 export default async function TaxEnginePage() {
   const me = await requireMe()
   if (!can(me, "tax_rules.view")) return <AccessDenied title={"Tax engine"} permission="tax_rules.view" />
+  if (me.organization?.is_demo) return <TaxEnginePreview />
 
   return (
     <PlannedFeature

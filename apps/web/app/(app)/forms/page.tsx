@@ -7,12 +7,14 @@ import { PlannedFeature } from "@/components/app/planned-feature"
 import { Button } from "@/components/ui/button"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { FormsPreview } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Forms" }
 
 export default async function FormsPage() {
   const me = await requireMe()
   if (!can(me, "forms.view")) return <AccessDenied title={"Forms"} permission="forms.view" />
+  if (me.organization?.is_demo) return <FormsPreview />
 
   return (
     <PlannedFeature

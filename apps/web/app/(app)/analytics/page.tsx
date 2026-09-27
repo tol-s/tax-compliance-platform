@@ -30,8 +30,7 @@ export default async function AnalyticsPage() {
   const { data } = await apiFetch<{ data: AnalyticsData }>("analytics")
   const { months, clients, registrations, documents, activity, workload } = data
   const vatRegistered = clients.by_vat_status.find((item) => item.key === "VAT_REGISTERED")?.count ?? 0
-  const scope =
-    data.scope === "organization" ? "all clients in your organisation" : "the clients assigned to you"
+  const scope = data.scope === "organization" ? "all clients in your organisation" : "the clients assigned to you"
 
   return (
     <div className="space-y-6">
@@ -120,7 +119,10 @@ export default async function AnalyticsPage() {
               }))}
             />
           </SectionCard>
-          <SectionCard title="Most active members" description="Recorded actions in the last 90 days, excluding sign-ins.">
+          <SectionCard
+            title="Most active members"
+            description="Recorded actions in the last 90 days, excluding sign-ins."
+          >
             <BreakdownBars
               items={activity.by_member_90_days.map((row) => ({ key: row.name, label: row.name, count: row.count }))}
               caption="Recorded actions per member in the last 90 days"
@@ -162,8 +164,8 @@ export default async function AnalyticsPage() {
 
       <p className="text-muted-foreground flex items-start gap-2 text-xs">
         <InfoIcon className="mt-px size-3.5 shrink-0" aria-hidden="true" />
-        Tax figures such as liabilities, VAT payable and filing status are added here once tax periods and
-        calculations are in use. Nothing on this page is estimated.
+        Tax figures such as liabilities, VAT payable and filing status are added here once tax periods and calculations
+        are in use. Nothing on this page is estimated.
       </p>
     </div>
   )

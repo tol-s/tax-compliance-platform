@@ -7,12 +7,14 @@ import { PlannedFeature } from "@/components/app/planned-feature"
 import { Button } from "@/components/ui/button"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { IntegrationsPreview, loadPreviewClients } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Integrations" }
 
 export default async function IntegrationsPage() {
   const me = await requireMe()
   if (!can(me, "clients.view")) return <AccessDenied title={"Integrations"} permission="clients.view" />
+  if (me.organization?.is_demo) return <IntegrationsPreview clients={await loadPreviewClients()} />
 
   return (
     <PlannedFeature

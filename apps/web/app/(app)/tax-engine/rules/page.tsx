@@ -4,12 +4,14 @@ import { AccessDenied } from "@/components/app/access-denied"
 import { PlannedFeature } from "@/components/app/planned-feature"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { RulesPreview } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Tax rules" }
 
 export default async function TaxEngineRulesPage() {
   const me = await requireMe()
   if (!can(me, "tax_rules.view")) return <AccessDenied title={"Tax rules"} permission="tax_rules.view" />
+  if (me.organization?.is_demo) return <RulesPreview />
 
   return (
     <PlannedFeature

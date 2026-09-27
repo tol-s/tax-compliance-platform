@@ -6,6 +6,7 @@ import { isApiError } from "@/lib/api/errors"
 import { apiFetch } from "@/lib/api/server"
 import { requireMe } from "@/lib/auth/me"
 import { formatDate } from "@/lib/format"
+import { sampleConnections, samplePeriods } from "@/features/preview/data"
 import type { Client } from "@/types/api"
 
 async function loadClient(id: string): Promise<Client> {
@@ -19,11 +20,18 @@ async function loadClient(id: string): Promise<Client> {
 }
 
 export default async function ClientLayout({ children, params }: LayoutProps<"/clients/[id]">) {
-  await requireMe()
+  const me = await requireMe()
   const { id } = await params
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound()
   const client = await loadClient(id)
   const registration = client.current_registration
+  // Staging organisations show sample connection and period facts to match the preview tabs.
+  const preview = me.organization?.is_demo
+    ? {
+        connection: sampleConnections([client])[0],
+        period: samplePeriods(client.id, registration?.vat_status === "VAT_REGISTERED")[3],
+      }
+    : null
 
   const facts: [string, React.ReactNode][] = [
     [
@@ -47,15 +55,31 @@ export default async function ClientLayout({ children, params }: LayoutProps<"/c
     ],
     [
       "Accounting",
-      <span key="acc" className="text-muted-foreground">
-        Not connected
-      </span>,
+      preview ? (
+        <span key="acc" className="flex items-center gap-1.5">
+          <StatusBadge status={preview.connection.status} />
+          <span className="text-muted-foreground text-xs">
+            {preview.connection.provider === "XERO" ? "Xero" : "QuickBooks Online"} (sample)
+          </span>
+        </span>
+      ) : (
+        <span key="acc" className="text-muted-foreground">
+          Not connected
+        </span>
+      ),
     ],
     [
       "Current period",
-      <span key="per" className="text-muted-foreground">
-        None open
-      </span>,
+      preview ? (
+        <span key="per" className="flex items-center gap-1.5">
+          <StatusBadge status={preview.period.status} />
+          <span className="text-muted-foreground text-xs">{preview.period.label} (sample)</span>
+        </span>
+      ) : (
+        <span key="per" className="text-muted-foreground">
+          None open
+        </span>
+      ),
     ],
     [
       "Compliance",

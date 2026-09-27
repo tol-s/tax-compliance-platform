@@ -4,12 +4,14 @@ import { AccessDenied } from "@/components/app/access-denied"
 import { PlannedFeature } from "@/components/app/planned-feature"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { IntegrationsPreview, loadPreviewClients } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "Xero" }
 
 export default async function IntegrationsXeroPage() {
   const me = await requireMe()
   if (!can(me, "clients.view")) return <AccessDenied title={"Xero"} permission="clients.view" />
+  if (me.organization?.is_demo) return <IntegrationsPreview clients={await loadPreviewClients()} provider="XERO" />
 
   return (
     <PlannedFeature

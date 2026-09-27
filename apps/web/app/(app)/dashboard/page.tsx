@@ -9,6 +9,12 @@ import { SectionCard } from "@/components/app/section-card"
 import { Button } from "@/components/ui/button"
 import { BreakdownBars, MonthlyColumns } from "@/features/analytics/charts"
 import { AuditTimeline } from "@/features/audit/audit-timeline"
+import {
+  DashboardExceptionsPreview,
+  DashboardIntegrationsPreview,
+  DashboardObligationsPreview,
+  loadPreviewClients,
+} from "@/features/preview/components"
 import { apiFetch } from "@/lib/api/server"
 import type { AnalyticsData, DashboardData } from "@/types/api"
 import { requireMe } from "@/lib/auth/me"
@@ -44,6 +50,7 @@ export default async function DashboardPage() {
   const clients = data.clients
   const activity = data.recent_activity
   const ownActivity = data.own_activity
+  const preview = me.organization?.is_demo && clients.total > 0 ? await loadPreviewClients() : null
 
   return (
     <div className="space-y-6">
@@ -148,36 +155,48 @@ export default async function DashboardPage() {
 
       <div className="grid items-start gap-6 xl:grid-cols-3">
         <SectionCard title="Exceptions requiring attention" className="xl:col-span-2">
-          <EmptyState
-            bordered={false}
-            icon={ShieldAlertIcon}
-            title="No open exceptions"
-            description="Missing data, unmapped accounts, threshold advisories and calculation anomalies will be listed here, highest severity first."
-          />
+          {preview ? (
+            <DashboardExceptionsPreview clients={preview} />
+          ) : (
+            <EmptyState
+              bordered={false}
+              icon={ShieldAlertIcon}
+              title="No open exceptions"
+              description="Missing data, unmapped accounts, threshold advisories and calculation anomalies will be listed here, highest severity first."
+            />
+          )}
         </SectionCard>
         <SectionCard title="Upcoming obligations">
-          <EmptyState
-            bordered={false}
-            icon={CalendarClockIcon}
-            title="No obligations scheduled"
-            description="Filing deadlines are derived from each client's tax periods."
-          />
+          {preview ? (
+            <DashboardObligationsPreview clients={preview} />
+          ) : (
+            <EmptyState
+              bordered={false}
+              icon={CalendarClockIcon}
+              title="No obligations scheduled"
+              description="Filing deadlines are derived from each client's tax periods."
+            />
+          )}
         </SectionCard>
       </div>
 
       <div className="grid items-start gap-6 xl:grid-cols-3">
         <SectionCard title="Integration status">
-          <EmptyState
-            bordered={false}
-            icon={PlugIcon}
-            title="No accounting connections"
-            description="Connect a client to Xero or QuickBooks Online to import accounting data."
-            action={
-              <Button asChild variant="outline" size="sm">
-                <Link href="/integrations">View integrations</Link>
-              </Button>
-            }
-          />
+          {preview ? (
+            <DashboardIntegrationsPreview clients={preview} />
+          ) : (
+            <EmptyState
+              bordered={false}
+              icon={PlugIcon}
+              title="No accounting connections"
+              description="Connect a client to Xero or QuickBooks Online to import accounting data."
+              action={
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/integrations">View integrations</Link>
+                </Button>
+              }
+            />
+          )}
         </SectionCard>
         <SectionCard
           title={activity ? "Recent activity" : "Your recent activity"}

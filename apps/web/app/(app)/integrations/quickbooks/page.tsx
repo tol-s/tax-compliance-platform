@@ -4,12 +4,15 @@ import { AccessDenied } from "@/components/app/access-denied"
 import { PlannedFeature } from "@/components/app/planned-feature"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
+import { IntegrationsPreview, loadPreviewClients } from "@/features/preview/components"
 
 export const metadata: Metadata = { title: "QuickBooks Online" }
 
 export default async function IntegrationsQuickbooksPage() {
   const me = await requireMe()
   if (!can(me, "clients.view")) return <AccessDenied title={"QuickBooks Online"} permission="clients.view" />
+  if (me.organization?.is_demo)
+    return <IntegrationsPreview clients={await loadPreviewClients()} provider="QUICKBOOKS" />
 
   return (
     <PlannedFeature
