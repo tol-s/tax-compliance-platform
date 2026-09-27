@@ -83,7 +83,15 @@ recycled. Configure a bucket before relying on document storage.
 
 **Migrations** are run from a trusted machine against `DB_URL`
 (`php artisan migrate --force && php artisan rbac:sync`), never from a public
-endpoint.
+endpoint. Where no machine can reach the database directly, the schema and
+demo data are exported as one SQL file (`pg_dump --no-owner --no-privileges
+--column-inserts`, wrapped in a transaction) and run once in the provider's SQL
+editor. The file must be generated with the same `APP_KEY` and
+`BLIND_INDEX_KEY` the API uses, because taxpayer identifiers are encrypted.
+
+**Documents without files.** If a document record exists but its file does not
+(ephemeral storage, or demo data loaded from SQL), the download endpoint returns
+404 `document_file_unavailable` rather than failing.
 
 **Demo data** can be seeded into a dedicated demo database with
 `APP_ENV=staging DEMO_MODE=true DEMO_PASSWORD=<private> php artisan db:seed --class=DemoSeeder`.

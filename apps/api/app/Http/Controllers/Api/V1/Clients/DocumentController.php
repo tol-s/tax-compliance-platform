@@ -10,6 +10,7 @@ use App\Domain\Documents\Models\Document;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Clients\StoreDocumentRequest;
 use App\Http\Resources\V1\DocumentResource;
+use App\Support\ApiError;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
@@ -40,10 +41,20 @@ class DocumentController extends Controller
     }
 
     /** Files are only served through this authorised, audited endpoint. */
-    public function download(Document $document, AuditLogger $audit): StreamedResponse
+    public function download(Document $document, AuditLogger $audit): StreamedResponse|JsonResponse
     {
         $client = $document->client()->firstOrFail();
         Gate::authorize('viewTaxProfile', $client);
+
+        // The record exists but the stored file does not (e.g. ephemeral storage, or demo
+        // data loaded without its files). Say so plainly rather than failing with a 500.
+        if (! Storage::disk($document->disk)->exists($document->path)) {
+            return ApiError::response(
+                'document_file_unavailable',
+                'This document is recorded, but its file is not available in this environment.',
+                404,
+            );
+        }
 
         $audit->record('document.downloaded', $document, metadata: ['sha256' => $document->sha256], clientId: $client->getKey());
 

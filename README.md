@@ -57,10 +57,25 @@ pnpm install
 pnpm dev                              # http://localhost:3000
 ```
 
-Demo users (only when seeded with `DEMO_MODE=true`): `owner@demo.test`,
-`admin@demo.test`, `tax-manager@demo.test`, `tax-preparer@demo.test`,
-`reviewer@demo.test`, `accountant@demo.test`, `read-only@demo.test`; password
-`demo-password`.
+### Demo sign-in
+
+The demo seeder creates clearly fictional data (12 taxpayers, registration
+histories, documents, team assignments and months of audit activity) and one
+user per role:
+
+| Email | Role |
+|-------|------|
+| `owner@demo.test` | Owner |
+| `admin@demo.test` | Admin |
+| `tax-manager@demo.test` | Tax Manager |
+| `tax-preparer@demo.test` | Tax Preparer (sees assigned clients only) |
+| `tax-preparer-2@demo.test` | Tax Preparer |
+| `reviewer@demo.test` | Reviewer |
+| `accountant@demo.test` | Accountant |
+| `read-only@demo.test` | Read Only |
+
+Password: `demo-password` **locally only**. Internet-facing demos are seeded
+with a private `DEMO_PASSWORD`, which is never committed to this repository.
 
 For a real organisation: `php artisan organization:create "Firm name" --owner-email=... --owner-name=...`.
 

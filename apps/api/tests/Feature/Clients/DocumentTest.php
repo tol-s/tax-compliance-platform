@@ -49,3 +49,15 @@ it('does not serve another organisation\'s documents', function () {
     actingAsMember(SystemRole::Owner);
     $this->get("/api/v1/documents/{$id}/download", ['Accept' => 'application/json'])->assertNotFound();
 });
+
+it('explains when a recorded document has no stored file', function () {
+    $id = $this->post("/api/v1/clients/{$this->clientId}/documents", [
+        'document' => certificatePdf(), 'kind' => 'OTHER',
+    ], ['Accept' => 'application/json'])->json('data.id');
+    $path = DB::table('documents')->where('id', $id)->value('path');
+    Storage::disk(config('filesystems.documents_disk'))->delete($path);
+
+    $this->get("/api/v1/documents/{$id}/download", ['Accept' => 'application/json'])
+        ->assertNotFound()
+        ->assertJsonPath('error.code', 'document_file_unavailable');
+});
