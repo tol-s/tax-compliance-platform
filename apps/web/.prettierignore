@@ -1,0 +1,7 @@
+.next
+node_modules
+pnpm-lock.yaml
+# Vendored upstream shadcn/ReUI code: kept byte-close to upstream for diffable updates.
+components/ui
+components/reui
+hooks

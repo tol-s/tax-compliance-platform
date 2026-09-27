@@ -1,0 +1,9 @@
+**/node_modules
+**/.next
+**/vendor
+**/.env
+**/.env.local
+apps/api/storage/logs/*
+apps/web/test-results
+apps/web/playwright-report
+.git
