@@ -58,7 +58,8 @@ test("a manager adds a NON-VAT client from its certificate, then records a VAT r
 test("a preparer sees only assigned clients and cannot open others", async ({ page }) => {
   await signIn(page, "tax-preparer@demo.test")
   await page.goto("/clients")
-  await expect(page.getByText("No clients yet")).toBeVisible()
+  await expect(page.getByText("Sampaguita Design Studio")).toBeVisible()
+  await expect(page.getByText("Harbourline Trading Corporation")).toHaveCount(0)
   await expect(page.getByRole("button", { name: "Add client" })).toHaveCount(0)
 })
 
@@ -66,10 +67,10 @@ test("the clients grid searches on the server", async ({ page }) => {
   await signIn(page, "reviewer@demo.test")
   await page.goto("/clients")
   await page.getByLabel("Search clients").fill("Sampaguita")
-  await expect(page.getByText("Demo Sampaguita Design Studio")).toBeVisible()
-  await expect(page.getByText("Demo Harbour Trading Corp")).toHaveCount(0)
-  await page.getByLabel("Search clients").fill("000-111-222-00000")
-  await expect(page.getByText("Demo Harbour Trading Corp")).toBeVisible()
+  await expect(page.getByText("Sampaguita Design Studio")).toBeVisible()
+  await expect(page.getByText("Harbourline Trading Corporation")).toHaveCount(0)
+  await page.getByLabel("Search clients").fill("000-101-201-00000")
+  await expect(page.getByText("Harbourline Trading Corporation")).toBeVisible()
 })
 
 test("administrators see the role matrix and member list", async ({ page }) => {

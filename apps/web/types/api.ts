@@ -191,6 +191,43 @@ export interface DashboardData {
   tax_periods: null
   exceptions: null
   recent_activity: AuditEvent[] | null
+  /** The member's own recent actions, when they cannot see the organisation's audit log. */
+  own_activity: AuditEvent[] | null
+}
+
+export interface AnalyticsBreakdownItem {
+  key: string
+  label: string
+  count: number
+}
+
+export type ActivityCategory = "clients" | "registration" | "documents" | "team" | "sign_ins"
+
+export interface AnalyticsData {
+  timezone: string
+  /** Last twelve calendar months, oldest first, as YYYY-MM. Every monthly series aligns to this. */
+  months: string[]
+  /** Whether client figures cover the whole organisation or only the user's assigned clients. */
+  scope: "organization" | "assigned"
+  clients: {
+    total: number
+    active: number
+    by_vat_status: AnalyticsBreakdownItem[]
+    by_registration_source: AnalyticsBreakdownItem[]
+    by_entity_type: AnalyticsBreakdownItem[]
+    by_industry: AnalyticsBreakdownItem[]
+    added_by_month: number[]
+  }
+  registrations: { initial_by_month: number[]; changes_by_month: number[] }
+  documents: { total: number; by_kind: AnalyticsBreakdownItem[]; uploaded_by_month: number[] }
+  /** Only for users who see every client. */
+  workload: { user_id: string; name: string; role: string; assigned_clients: number }[] | null
+  /** Only for users with audit.view. */
+  activity: {
+    by_month: ({ month: string } & Record<ActivityCategory, number>)[]
+    by_member_90_days: { name: string; count: number }[]
+    active_members_by_month: number[]
+  } | null
 }
 
 export interface SearchResult {

@@ -42,7 +42,7 @@ export function OrganizationSwitcher() {
                 <span className="truncate text-sm font-medium">{current?.name ?? "No organisation"}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {me.role?.name}
-                  {current?.is_demo ? " · Demo" : ""}
+                  {current?.is_demo ? " · Staging" : ""}
                 </span>
               </span>
               <ChevronsUpDownIcon className="text-muted-foreground ml-auto size-4" aria-hidden />

@@ -24,6 +24,7 @@ Phases 1 (foundation) and 2 (client management) are complete. See `docs/IMPLEMEN
 | Design system, ReUI/shadcn components, app shell, Cmd/Ctrl+K | ✅ |
 | All IA routes with honest empty states (no fabricated data) | ✅ |
 | Clients, taxpayer registration (effective-dated, evidenced), documents, users, audit viewer | ✅ Phase 2 |
+| Analytics: role-scoped charts from real records (no tax figures) | ✅ |
 | Integrations, tax engine, forms, workflow | Phases 3-11 |
 
 ## Repository layout
@@ -47,7 +48,7 @@ cd apps/api
 cp .env.example .env && php artisan key:generate
 composer install
 php artisan migrate --seed            # permission catalogue + system roles
-DEMO_MODE=true php artisan db:seed --class=DemoSeeder   # optional, fictional demo firm
+DEMO_MODE=true php artisan db:seed --class=DemoSeeder   # optional, staging data
 php artisan serve --port=8000
 
 # Web
@@ -59,9 +60,9 @@ pnpm dev                              # http://localhost:3000
 
 ### Demo sign-in
 
-The demo seeder creates clearly fictional data (12 taxpayers, registration
-histories, documents, team assignments and months of audit activity) and one
-user per role:
+The demo seeder creates staging data (24 test taxpayers plus a second firm,
+registration histories, documents, team assignments and twelve months of
+activity by every role, which feeds the Analytics page) and one user per role:
 
 | Email | Role |
 |-------|------|

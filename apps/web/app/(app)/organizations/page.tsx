@@ -40,7 +40,7 @@ export default async function OrganizationsPage() {
                     <span className="text-muted-foreground ml-2 text-xs">(current)</span>
                   ) : null}
                   {membership.organization.is_demo ? (
-                    <StatusBadge status="DEMO" tone="warning" className="ml-2" />
+                    <StatusBadge status="STAGING" label="Staging" tone="warning" className="ml-2" />
                   ) : null}
                 </TableCell>
                 <TableCell>{membership.role.name}</TableCell>

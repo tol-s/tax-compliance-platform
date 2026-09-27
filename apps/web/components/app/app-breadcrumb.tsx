@@ -34,6 +34,7 @@ const LABELS: Record<string, string> = {
   versions: "Versions",
   "test-scenarios": "Test scenarios",
   templates: "Templates",
+  analytics: "Analytics",
   reports: "Reports",
   settings: "Settings",
   users: "Users",

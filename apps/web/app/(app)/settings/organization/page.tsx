@@ -18,7 +18,7 @@ export default async function OrganizationSettingsPage() {
     ["Identifier", organization.slug],
     ["Country", organization.country_code],
     ["Base currency", organization.base_currency],
-    ["Environment", organization.is_demo ? "Demo (fictional data)" : "Live"],
+    ["Environment", organization.is_demo ? "Staging" : "Live"],
   ]
 
   return (

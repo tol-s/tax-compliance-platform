@@ -78,7 +78,7 @@ listed with their implementation status.
 
 - Demo data seeds only with `DEMO_MODE=true` **and** a non-production
   environment; the demo organisation is flagged `is_demo` and the UI shows a
-  persistent "fictional data" banner.
+  persistent "staging data" banner.
 
 ## Reporting a vulnerability
 

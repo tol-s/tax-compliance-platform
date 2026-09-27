@@ -104,11 +104,14 @@
   --input: oklch(0.89 0.008 250);
   --ring: oklch(0.58 0.1 257);
 
-  --chart-1: oklch(0.45 0.09 257);
-  --chart-2: oklch(0.62 0.1 200);
-  --chart-3: oklch(0.7 0.11 160);
-  --chart-4: oklch(0.75 0.12 80);
-  --chart-5: oklch(0.6 0.12 30);
+  /* Categorical chart slots, validated for colour-vision deficiency against the card
+     surface (adjacent CVD ΔE >= 8, normal-vision ΔE >= 15). Assign in order, never cycle.
+     Slots 3 to 5 sit below 3:1 on white, so every chart also offers a data table. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
 
   --sidebar: oklch(0.975 0.003 247);
   --sidebar-foreground: oklch(0.3 0.015 257);
@@ -153,11 +156,11 @@
   --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.6 0.08 250);
 
-  --chart-1: oklch(0.72 0.09 250);
-  --chart-2: oklch(0.7 0.1 200);
-  --chart-3: oklch(0.72 0.11 160);
-  --chart-4: oklch(0.78 0.12 80);
-  --chart-5: oklch(0.68 0.12 30);
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
 
   --sidebar: oklch(0.19 0.011 257);
   --sidebar-foreground: oklch(0.88 0.006 247);

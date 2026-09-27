@@ -30,7 +30,7 @@ test("owner sees the full shell, demo banner and honest empty states", async ({ 
   await signIn(page, "owner@demo.test")
 
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible()
-  await expect(page.getByRole("note")).toContainText("Demo organisation")
+  await expect(page.getByRole("note")).toContainText("Staging environment")
   // Demo data exists, so the dashboard shows computed figures, not an empty state.
   await expect(page.getByRole("region", { name: "Compliance health" }).getByText("VAT registered")).toBeVisible()
 

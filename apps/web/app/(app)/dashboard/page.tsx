@@ -7,9 +7,10 @@ import { MetricCard } from "@/components/app/metric-card"
 import { PageHeader } from "@/components/app/page-header"
 import { SectionCard } from "@/components/app/section-card"
 import { Button } from "@/components/ui/button"
+import { BreakdownBars, MonthlyColumns } from "@/features/analytics/charts"
 import { AuditTimeline } from "@/features/audit/audit-timeline"
 import { apiFetch } from "@/lib/api/server"
-import type { DashboardData } from "@/types/api"
+import type { AnalyticsData, DashboardData } from "@/types/api"
 import { requireMe } from "@/lib/auth/me"
 import { can } from "@/lib/auth/permissions"
 
@@ -36,9 +37,13 @@ const WORKFLOW = [
 export default async function DashboardPage() {
   const me = await requireMe()
   const canCreateClients = can(me, "clients.create")
-  const { data } = await apiFetch<{ data: DashboardData }>("dashboard")
+  const [{ data }, { data: analytics }] = await Promise.all([
+    apiFetch<{ data: DashboardData }>("dashboard"),
+    apiFetch<{ data: AnalyticsData }>("analytics"),
+  ])
   const clients = data.clients
   const activity = data.recent_activity
+  const ownActivity = data.own_activity
 
   return (
     <div className="space-y-6">
@@ -85,6 +90,62 @@ export default async function DashboardPage() {
         </section>
       )}
 
+      {clients.total > 0 ? (
+        <div className="grid items-start gap-6 xl:grid-cols-3">
+          {analytics.activity ? (
+            <SectionCard
+              title="Team activity"
+              description="Audited events each month, by area of work."
+              className="xl:col-span-2"
+              action={
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/analytics">All analytics</Link>
+                </Button>
+              }
+            >
+              <MonthlyColumns
+                months={analytics.months}
+                caption="Audited events per month by category"
+                series={[
+                  { key: "clients", label: "Clients", values: analytics.activity.by_month.map((m) => m.clients) },
+                  {
+                    key: "registration",
+                    label: "Registration and profile",
+                    values: analytics.activity.by_month.map((m) => m.registration),
+                  },
+                  { key: "documents", label: "Documents", values: analytics.activity.by_month.map((m) => m.documents) },
+                  { key: "team", label: "Team and settings", values: analytics.activity.by_month.map((m) => m.team) },
+                  { key: "sign_ins", label: "Sign-ins", values: analytics.activity.by_month.map((m) => m.sign_ins) },
+                ]}
+              />
+            </SectionCard>
+          ) : (
+            <SectionCard
+              title="New clients"
+              description="Clients added each month."
+              className="xl:col-span-2"
+              action={
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/analytics">All analytics</Link>
+                </Button>
+              }
+            >
+              <MonthlyColumns
+                months={analytics.months}
+                caption="New clients per month"
+                series={[{ key: "added", label: "Clients added", values: analytics.clients.added_by_month }]}
+              />
+            </SectionCard>
+          )}
+          <SectionCard title="VAT status" description="Each client's current registered status.">
+            <BreakdownBars items={analytics.clients.by_vat_status} caption="Clients by VAT status" unit="clients" />
+            <div className="mt-6">
+              <BreakdownBars items={analytics.clients.by_entity_type} caption="Clients by entity type" unit="clients" />
+            </div>
+          </SectionCard>
+        </div>
+      ) : null}
+
       <div className="grid items-start gap-6 xl:grid-cols-3">
         <SectionCard title="Exceptions requiring attention" className="xl:col-span-2">
           <EmptyState
@@ -118,19 +179,20 @@ export default async function DashboardPage() {
             }
           />
         </SectionCard>
-        <SectionCard title="Recent activity" description="Changes across your organisation.">
+        <SectionCard
+          title={activity ? "Recent activity" : "Your recent activity"}
+          description={activity ? "Changes across your organisation." : "What you have done on your clients."}
+        >
           {activity && activity.length > 0 ? (
             <AuditTimeline events={activity} />
+          ) : ownActivity && ownActivity.length > 0 ? (
+            <AuditTimeline events={ownActivity} />
           ) : (
             <EmptyState
               bordered={false}
               icon={ActivityIcon}
-              title={activity ? "No activity yet" : "Activity is visible to auditors"}
-              description={
-                activity
-                  ? "Client changes, registration updates and uploads will appear here."
-                  : "Your role does not include audit.view."
-              }
+              title="No activity yet"
+              description="Client changes, registration updates, uploads and downloads will appear here."
             />
           )}
         </SectionCard>

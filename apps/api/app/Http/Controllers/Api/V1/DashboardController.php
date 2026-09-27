@@ -28,14 +28,24 @@ class DashboardController extends Controller
         $unverified = $clients()
             ->whereHas('currentRegistration', fn (Builder $q) => $q->whereNull('source_document_id'))->count();
 
-        $activity = $user->can('audit.view')
+        $recent = fn () => AuditLog::query()
+            ->leftJoin('users', 'users.id', '=', 'audit_logs.actor_id')
+            ->select('audit_logs.*', 'users.name as actor_name')
+            ->whereNotIn('audit_logs.action', ['auth.login', 'auth.logout', 'auth.login_failed'])
+            ->latest('audit_logs.created_at')
+            ->limit(10);
+
+        $activity = $user->can('audit.view') ? AuditLogResource::collection($recent()->get()) : null;
+
+        // Without audit.view, people still see their own recent actions, but only on
+        // clients they can currently see, so a removed assignment reveals nothing.
+        $ownActivity = $activity === null
             ? AuditLogResource::collection(
-                AuditLog::query()
-                    ->leftJoin('users', 'users.id', '=', 'audit_logs.actor_id')
-                    ->select('audit_logs.*', 'users.name as actor_name')
-                    ->whereNotIn('audit_logs.action', ['auth.login', 'auth.logout', 'auth.login_failed'])
-                    ->latest('audit_logs.created_at')
-                    ->limit(10)
+                $recent()
+                    ->where('audit_logs.actor_id', $user->getKey())
+                    ->where(fn (Builder $q) => $q
+                        ->whereNull('audit_logs.client_id')
+                        ->orWhereIn('audit_logs.client_id', $access->visibleClients($user)->select('clients.id')))
                     ->get()
             )
             : null;
@@ -51,6 +61,7 @@ class DashboardController extends Controller
             'tax_periods' => null,
             'exceptions' => null,
             'recent_activity' => $activity,
+            'own_activity' => $ownActivity,
         ]]);
     }
 }

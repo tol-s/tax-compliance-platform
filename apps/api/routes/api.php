@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AnalyticsController;
 use App\Http\Controllers\Api\V1\AuditController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Clients\ClientAssignmentController;
@@ -37,6 +38,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
             Route::get('reference', ReferenceController::class)->name('reference');
             Route::get('dashboard', DashboardController::class)->name('dashboard');
+            Route::get('analytics', AnalyticsController::class)->name('analytics');
             Route::get('search', SearchController::class)->name('search');
 
             Route::apiResource('clients', ClientController::class)->except('destroy');

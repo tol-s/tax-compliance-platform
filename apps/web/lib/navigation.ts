@@ -2,6 +2,7 @@ import {
   BarChart3Icon,
   BookCheckIcon,
   Building2Icon,
+  ChartLineIcon,
   FileTextIcon,
   LayoutDashboardIcon,
   PlugIcon,
@@ -45,6 +46,13 @@ export const navigation: NavGroup[] = [
         icon: Building2Icon,
         permission: "clients.view",
         keywords: ["taxpayers"],
+      },
+      {
+        title: "Analytics",
+        href: "/analytics",
+        icon: ChartLineIcon,
+        permission: "clients.view",
+        keywords: ["charts", "insights", "trends", "workload"],
       },
       {
         title: "Reports",

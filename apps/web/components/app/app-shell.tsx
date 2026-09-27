@@ -21,7 +21,7 @@ export function AppShell({ me, defaultOpen, children }: { me: Me; defaultOpen: b
           <TopBar />
           {me.organization?.is_demo ? (
             <div className="bg-warning/10 text-warning-foreground border-b px-4 py-1.5 text-xs font-medium" role="note">
-              Demo organisation · fictional data for demonstration only. Not real taxpayers, not real tax rules.
+              Staging environment · staging data for testing and review. Not for live filing.
             </div>
           ) : null}
           <div
