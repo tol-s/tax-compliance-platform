@@ -24,6 +24,7 @@ class DemoSeeder extends Seeder
 {
     public const ORGANIZATION_NAME = 'Demo Accounting Firm';
 
+    /** Local default only. Deployed demos must set DEMO_PASSWORD to something private. */
     public const PASSWORD = 'demo-password';
 
     public function run(CreateOrganization $createOrganization): void
@@ -92,7 +93,7 @@ class DemoSeeder extends Seeder
     {
         return User::query()->firstOrCreate(
             ['email' => $email],
-            ['name' => $name, 'password' => self::PASSWORD],
+            ['name' => $name, 'password' => (string) (env('DEMO_PASSWORD') ?: self::PASSWORD)],
         );
     }
 }

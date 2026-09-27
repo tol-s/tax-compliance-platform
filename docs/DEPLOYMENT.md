@@ -40,6 +40,42 @@ production regardless.
   decisions for the operator; archival must copy, never delete in place.
 - Backups: database PITR plus object storage versioning.
 
+## Vercel deployment (serverless)
+
+Two Vercel projects deploy from this repository:
+
+| Project | Root directory | Runtime |
+|---------|----------------|---------|
+| Web | `apps/web` | Next.js (native) |
+| API | `apps/api` | `vercel-php@0.8.0` (PHP 8.4), entrypoint `api/index.php`, config `apps/api/vercel.json` |
+
+Serverless adaptations (all driven by `VERCEL=1` and `apps/api/vercel.json`):
+
+- Writable paths (`storage/`, framework caches, compiled views) move to `/tmp`.
+- Logs go to stderr as JSON (Vercel runtime logs).
+- Cache uses the **database** store, so login rate limits hold across function
+  instances; queues run synchronously; there is no Redis dependency, and the
+  health check only probes Redis where it is configured.
+- `api/index.php` presents requests as hitting `public/index.php` at the web
+  root, otherwise `/api` would be treated as the base path.
+
+Required API environment variables: `APP_KEY`, `BLIND_INDEX_KEY`,
+`DB_URL` (PostgreSQL, SSL; the database must allow the `btree_gist` extension),
+`FRONTEND_URL`. Web: `API_URL` (the API's production URL), `SESSION_SECRET`.
+
+**Documents on Vercel.** The function filesystem is ephemeral. Until an
+S3-compatible bucket is configured (`DOCUMENTS_DISK=s3` plus `AWS_*`), uploaded
+certificates are stored in `/tmp` and will disappear when the instance is
+recycled. Configure a bucket before relying on document storage.
+
+**Migrations** are run from a trusted machine against `DB_URL`
+(`php artisan migrate --force && php artisan rbac:sync`), never from a public
+endpoint.
+
+**Demo data** can be seeded into a dedicated demo database with
+`APP_ENV=staging DEMO_MODE=true DEMO_PASSWORD=<private> php artisan db:seed --class=DemoSeeder`.
+Never use the public default password on an internet-facing deployment.
+
 ## Status
 
 The Dockerfiles and `docker-compose.yml` are written and `docker compose config`

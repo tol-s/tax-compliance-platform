@@ -10,7 +10,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -37,3 +37,16 @@ return Application::configure(basePath: dirname(__DIR__))
         });
         $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'token']);
     })->create();
+
+// Serverless (Vercel): the deployment filesystem is read-only apart from /tmp.
+if (getenv('VERCEL')) {
+    $storage = '/tmp/storage';
+    foreach (['framework/cache/data', 'framework/views', 'logs', 'app/private'] as $dir) {
+        if (! is_dir("{$storage}/{$dir}")) {
+            mkdir("{$storage}/{$dir}", 0775, true);
+        }
+    }
+    $app->useStoragePath($storage);
+}
+
+return $app;

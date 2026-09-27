@@ -13,10 +13,13 @@ class HealthController extends Controller
 {
     public function __invoke(): JsonResponse
     {
-        $checks = [
-            'database' => $this->check(fn () => DB::select('select 1')),
-            'redis' => $this->check(fn () => Redis::connection()->ping()),
-        ];
+        $checks = ['database' => $this->check(fn () => DB::select('select 1'))];
+
+        // Redis is only a dependency where cache or queues are configured to use it
+        // (not in the serverless deployment).
+        if (in_array('redis', [config('cache.default'), config('queue.default')], true)) {
+            $checks['redis'] = $this->check(fn () => Redis::connection()->ping());
+        }
         $ok = ! in_array(false, $checks, true);
 
         return response()->json(['status' => $ok ? 'ok' : 'degraded', 'checks' => $checks], $ok ? 200 : 503);
